@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Desktop</string>
+    <item name="data" type="id"/>
+    <dimen name="dimen_1">1dp</dimen>
+</resources>
