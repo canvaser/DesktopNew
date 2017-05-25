@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
   <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
       android:layout_margin="3dp"
       android:elevation="2dp"
-      android:orientation="horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
+      android:orientation="horizontal">
 
 
   <ImageView
-      android:scaleType="centerInside"
       android:id="@+id/image"
-      android:src="@drawable/app"
       android:layout_width="80dp"
-      android:layout_height="80dp" />
+      android:layout_height="80dp"
+      android:scaleType="centerInside"
+      android:src="@drawable/app" />
 
   <TextView
       android:id="@+id/textView"
@@ -26,5 +24,6 @@
       android:layout_height="match_parent"
       android:layout_weight="1"
       android:text="聚合分析、过滤泡沫、情感可视、发展预测，集四大功能于一体的App印象，是一款帮助App开发运维人员轻松便捷、快速有效的管理手机应用市场里App评论的SaaS产品" />
-</LinearLayout>
+
+  </LinearLayout>
 </LinearLayout>

@@ -7,20 +7,22 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
-
-import com.summer.desktop.R;
-import com.summer.desktop.base.BaseAct;
-import com.summer.desktop.util.FragList;
-import com.summer.desktop.view.BottomItemView;
-import com.summer.desktop.view.MainFrag;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.summer.desktop.R;
+import com.summer.desktop.base.BaseAct;
+import com.summer.desktop.bean.gson.Note;
+import com.summer.desktop.util.FragList;
+import com.summer.desktop.view.BottomItemView;
+import com.summer.desktop.view.NoteListssFrag;
+
+import java.util.ArrayList;
 
 public class MainAct extends BaseAct implements View.OnClickListener{
 
     @BindView(R.id.viewpager)
     BottomItemView viewPager;
+    long aLong = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,15 +31,17 @@ public class MainAct extends BaseAct implements View.OnClickListener{
         ButterKnife.bind(this);
         viewPager.setAdapter(new BottomItemView.MenuAdapter(this));
         ((BottomItemView.MenuAdapter)viewPager.getAdapter()).setOnClickListener(this);
-        MainFrag mainFrag = new MainFrag();
+        NoteListssFrag noteListssFrag = new NoteListssFrag();
         Bundle bundle = new Bundle();
+        Note note = new Note(Note.NOTEBOOK,"0");
+        ArrayList<Note> notes = new ArrayList<>();
+        notes.add(note);
+        note.setObjectId("0");
         bundle.putBoolean("first",true);
-        mainFrag.setArguments(bundle);
-        FragList.getInstance().add(this,mainFrag);
-
+        bundle.putSerializable("data",notes);
+        noteListssFrag.setArguments(bundle);
+        FragList.getInstance().add(this, noteListssFrag);
     }
-
-    long aLong =0;
 
     @Override
     public void onClick(View v) {

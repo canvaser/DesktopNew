@@ -8,16 +8,12 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.summer.desktop.R;
 import com.summer.desktop.base.BaseFrag;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-public class MainFrag extends BaseFrag{
-
-
+public class NoteDetailsFrag extends BaseFrag {
 
 
     @BindView(R.id.container)
@@ -29,16 +25,15 @@ public class MainFrag extends BaseFrag{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frag_main,container,false);
+        return inflater.inflate(R.layout.frag_notes, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this,view);
-        container.setAdapter(new ContainAdapter(getChildFragmentManager()));
+        ButterKnife.bind(this, view);
+        container.setAdapter(new NoteDetailsAdapter(getChildFragmentManager()));
     }
-
 
 
 }
