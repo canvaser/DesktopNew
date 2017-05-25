@@ -8,6 +8,10 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.summer.desktop.R;
 import com.summer.desktop.base.BaseAct;
 import com.summer.desktop.util.FragList;
@@ -21,6 +25,7 @@ public class MainAct extends BaseAct implements View.OnClickListener{
 
     @BindView(R.id.viewpager)
     BottomItemView viewPager;
+    long aLong = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,9 +40,18 @@ public class MainAct extends BaseAct implements View.OnClickListener{
         mainFrag.setArguments(bundle);
         FragList.getInstance().add(this,mainFrag);
 
-    }
+        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(this);
+        config.threadPriority(Thread.NORM_PRIORITY - 2);
+        config.denyCacheImageMultipleSizesInMemory();
+        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
+        config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
+        config.tasksProcessingOrder(QueueProcessingType.LIFO);
+        config.writeDebugLogs(); // Remove for release app
 
-    long aLong =0;
+        // Initialize ImageLoader with configuration.
+        ImageLoader.getInstance().init(config.build());
+
+    }
 
     @Override
     public void onClick(View v) {

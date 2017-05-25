@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +22,13 @@ import java.util.Random;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class NewsFrag extends BaseFrag implements View.OnClickListener{
+public class NewsFrag extends BaseFrag implements View.OnClickListener, View.OnLongClickListener {
 
     @BindView(R.id.recycle)
     RecyclerView recyclerView;
 
+
+    Random random = new Random();
 
     @Nullable
     @Override
@@ -43,19 +44,36 @@ public class NewsFrag extends BaseFrag implements View.OnClickListener{
         recyclerView.addItemDecoration(new LinearItemDecoration(getContext(),1));
         recyclerView.setAdapter(new NewsAdapter(getContext()));
         ((NewsAdapter)recyclerView.getAdapter()).setOnClickListener(this);
+        ((NewsAdapter) recyclerView.getAdapter()).setOnLongClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        if (random.nextBoolean()) {
+            TxtFrags txtFarg = new TxtFrags();
+            FragList.getInstance().add(getActivity(), txtFarg);
+            return;
+        }
         MainFrag mainFrag = new MainFrag();
         FragList.getInstance().add(getActivity(),mainFrag);
     }
 
-    public static class  NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsHolder> implements View.OnClickListener{
+    @Override
+    public boolean onLongClick(View v) {
+        BoomFrag boomFrag = new BoomFrag();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.root, boomFrag);
+        transaction.commit();
+        return true;
+    }
+
+    public static class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsHolder> implements View.OnClickListener, View.OnLongClickListener {
 
         Context context;
 
         View.OnClickListener onClickListener;
+
+        View.OnLongClickListener onLongClickListener;
 
         Random random = new Random();
 
@@ -71,6 +89,7 @@ public class NewsFrag extends BaseFrag implements View.OnClickListener{
         @Override
         public void onBindViewHolder(NewsAdapter.NewsHolder holder, int position) {
             holder.itemView.setOnClickListener(this);
+            holder.itemView.setOnLongClickListener(this);
             holder.itemView.setTag(R.id.data,position);
             holder.textView.setText(holder.textView.getText().toString()+1000000*random.nextFloat());
         }
@@ -91,10 +110,23 @@ public class NewsFrag extends BaseFrag implements View.OnClickListener{
             this.onClickListener = onClickListener;
         }
 
+        public void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
+            this.onLongClickListener = onLongClickListener;
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (onLongClickListener != null) {
+                onLongClickListener.onLongClick(v);
+            }
+            return true;
+        }
+
         public static class NewsHolder extends RecyclerView.ViewHolder{
 
             @BindView(R.id.textView)
             TextView textView;
+
 
             public NewsHolder(View itemView) {
                 super(itemView);
