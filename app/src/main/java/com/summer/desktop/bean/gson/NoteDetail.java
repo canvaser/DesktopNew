@@ -12,6 +12,8 @@ public class NoteDetail extends BaseBean{
 
     public static final String TXT = "txt";
 
+    public static final String LINK = "link";
+
 
     private String type;
 

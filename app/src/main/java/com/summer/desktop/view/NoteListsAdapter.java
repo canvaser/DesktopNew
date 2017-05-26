@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
 import com.summer.desktop.bean.gson.Note;
 
 import java.util.ArrayList;
@@ -21,11 +22,22 @@ public class NoteListsAdapter extends FragmentStatePagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-        NoteListFrag noteListFrag = new NoteListFrag();
+        Fragment fragment = null;
         Bundle bundle = new Bundle();
-        bundle.putSerializable("data",notes.get(position));
-        noteListFrag.setArguments(bundle);
-        return noteListFrag;
+        switch (notes.get(position).getType()) {
+            case Note.NOTE:
+                fragment = new NoteDetailFrag();
+                bundle.putSerializable("data", notes.get(position));
+                fragment.setArguments(bundle);
+                break;
+            case Note.NOTEBOOK:
+                fragment = new NoteListFrag();
+                bundle.putSerializable("data", notes.get(position));
+                fragment.setArguments(bundle);
+                break;
+        }
+
+        return fragment;
     }
 
 //    @Override

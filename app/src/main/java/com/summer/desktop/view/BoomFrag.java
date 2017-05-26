@@ -9,14 +9,16 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
 import com.hitomi.cmlibrary.CircleMenu;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
 import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 import com.summer.desktop.R;
 import com.summer.desktop.base.BaseFrag;
 import com.summer.desktop.imp.Onfinish;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class BoomFrag extends BaseFrag implements View.OnClickListener {
 
@@ -41,18 +43,17 @@ public class BoomFrag extends BaseFrag implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         view.setOnClickListener(this);
-        circleMenu.setMainMenu(Color.parseColor("#CDCDCD"), R.mipmap.ic_launcher_round, R.mipmap.ic_launcher_round)
-                .addSubMenu(Color.parseColor("#258CFF"), R.mipmap.ic_launcher_round)
-                .addSubMenu(Color.parseColor("#30A400"), R.mipmap.ic_launcher_round)
-                .addSubMenu(Color.parseColor("#FF4B32"), R.mipmap.ic_launcher_round)
-                .addSubMenu(Color.parseColor("#8A39FF"), R.mipmap.ic_launcher_round)
-                .addSubMenu(Color.parseColor("#FF6A00"), R.mipmap.ic_launcher_round)
+        circleMenu.setMainMenu(Color.parseColor("#CDCDCD"), R.mipmap.ic_launcher_round, R.drawable.app)
+                .addSubMenu(Color.parseColor("#258CFF"), R.drawable.note)
+                .addSubMenu(Color.parseColor("#258CFF"), R.drawable.notebook)
+                .addSubMenu(Color.parseColor("#30A400"), R.drawable.delete)
+                .addSubMenu(Color.parseColor("#FF4B32"), R.drawable.rename)
                 .setOnMenuSelectedListener(new OnMenuSelectedListener() {
 
                     @Override
                     public void onMenuSelected(int index) {
                         if(onfinish!=null){
-                            onfinish.finished(null);
+                            onfinish.finished(index);
                         }
                     }
 

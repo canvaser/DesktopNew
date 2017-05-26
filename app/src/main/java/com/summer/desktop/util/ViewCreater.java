@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.summer.desktop.R;
@@ -35,9 +36,10 @@ public class ViewCreater {
                 case NoteDetail.IMAGE:
                     ImageView imageView = new ImageView(context);
                     imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER);
                     ImageNote imageNote = gson.fromJson(data.get(i).getData(),ImageNote.class);
                     Glide.with(context).asBitmap().load(imageNote.getSrc()).into(imageView);
+                    //ImageLoader.getInstance().displayImage(imageNote.getSrc(),imageView);
                     linearLayout.addView(imageView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     imageView.setTag(R.id.position, i);
                     break;

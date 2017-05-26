@@ -6,22 +6,29 @@ package com.summer.desktop.main;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
 import com.summer.desktop.R;
 import com.summer.desktop.base.BaseAct;
 import com.summer.desktop.bean.gson.Note;
 import com.summer.desktop.util.FragList;
+import com.summer.desktop.util.TitleUtil;
 import com.summer.desktop.view.BottomItemView;
 import com.summer.desktop.view.NoteListssFrag;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainAct extends BaseAct implements View.OnClickListener{
 
     @BindView(R.id.viewpager)
     BottomItemView viewPager;
+
+    @BindView(R.id.toptitle)
+    TextView textView;
     long aLong = 0;
 
     @Override
@@ -41,6 +48,7 @@ public class MainAct extends BaseAct implements View.OnClickListener{
         bundle.putSerializable("data",notes);
         noteListssFrag.setArguments(bundle);
         FragList.getInstance().add(this, noteListssFrag);
+
     }
 
     @Override
@@ -57,5 +65,13 @@ public class MainAct extends BaseAct implements View.OnClickListener{
             }
             viewPager.setCurrentItem((position-2));
         }
+    }
+
+    public void setTitle() {
+        String ss = "";
+        for (int i = 0; i < TitleUtil.getInstance().getName().size(); i++) {
+            ss += TitleUtil.getInstance().getName().get(i) + "/";
+        }
+        textView.setText(ss);
     }
 }

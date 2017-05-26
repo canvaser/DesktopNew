@@ -10,13 +10,18 @@ public class Note extends BaseBean {
 
     public static final String NOTE = "note";
 
-    public static final String NOTEBOOK = " notebook";
+    public static final String NOTEBOOK = "notebook";
 
     private String parentId;
 
     private String type;
 
     private String name;
+
+    private String data;
+
+    public Note() {
+    }
 
     public Note(String type, String name) {
         this.type = type;
@@ -45,5 +50,13 @@ public class Note extends BaseBean {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

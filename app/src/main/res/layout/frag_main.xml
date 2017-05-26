@@ -4,18 +4,11 @@
     android:layout_height="match_parent"
     android:background="#53f3f3">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:background="@color/colorAccent">
-
-    </LinearLayout>
 
     <com.summer.desktop.view.MainViewPager
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-        android:layout_marginTop="25dp"
 />
 
 </RelativeLayout>

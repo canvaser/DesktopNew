@@ -12,14 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FindListener;
+
+import com.google.gson.Gson;
 import com.summer.desktop.R;
 import com.summer.desktop.base.BaseFrag;
+import com.summer.desktop.bean.gson.GsonNoteBean;
 import com.summer.desktop.bean.gson.Note;
 import com.summer.desktop.imp.Onfinish;
 import com.summer.desktop.util.FragList;
@@ -28,17 +25,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
+
 public class NoteListFrag extends BaseFrag implements View.OnClickListener, View.OnLongClickListener {
 
     @BindView(R.id.recycle)
     RecyclerView recyclerView;
+
+    @BindView(R.id.notelist)
+    View listView;
 
 
     Random random = new Random();
 
     ArrayList<Note> notes = new ArrayList<>();
 
-    Note note ;
+    Note parentNote;
+
+    Gson gson = new Gson();
 
     @Nullable
     @Override
@@ -52,67 +62,46 @@ public class NoteListFrag extends BaseFrag implements View.OnClickListener, View
         ButterKnife.bind(this,view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new LinearItemDecoration(getContext(),1));
-        note = (Note) getArguments().getSerializable("data");
+        listView.setOnLongClickListener(this);
+        parentNote = (Note) getArguments().getSerializable("data");
+        getData();
+    }
 
-
-
-        if(note!=null && !note.getObjectId().endsWith("0")){
-            recyclerView.setAdapter(new NewsAdapter(getContext(),notes));
-            ((NewsAdapter)recyclerView.getAdapter()).setOnClickListener(NoteListFrag.this);
-            ((NewsAdapter) recyclerView.getAdapter()).setOnLongClickListener(NoteListFrag.this);
-            return;
+    public void getData() {
+        if (parentNote != null) {
+            BmobQuery<Note> query = new BmobQuery<Note>();
+            //查询playerName叫“比目”的数据
+            query.addWhereEqualTo("parentId", parentNote.getObjectId());
+            //返回50条数据，如果不加上这条语句，默认返回10条数据
+            query.setLimit(50);
+            //执行查询方法
+            query.findObjects(new FindListener<Note>() {
+                @Override
+                public void done(List<Note> object, BmobException e) {
+                    notes = (ArrayList<Note>) object;
+                    recyclerView.setAdapter(new NewsAdapter(getContext(), notes));
+                    ((NewsAdapter) recyclerView.getAdapter()).setOnClickListener(NoteListFrag.this);
+                    ((NewsAdapter) recyclerView.getAdapter()).setOnLongClickListener(NoteListFrag.this);
+                }
+            });
         }
-        BmobQuery<Note> query = new BmobQuery<Note>();
-        //查询playerName叫“比目”的数据
-        //返回50条数据，如果不加上这条语句，默认返回10条数据
-        query.setLimit(50);
-        //执行查询方法
-        query.findObjects(new FindListener<Note>() {
-            @Override
-            public void done(List<Note> object, BmobException e) {
-                notes = (ArrayList<Note>) object;
-                recyclerView.setAdapter(new NewsAdapter(getContext(),notes));
-                ((NewsAdapter)recyclerView.getAdapter()).setOnClickListener(NoteListFrag.this);
-                ((NewsAdapter) recyclerView.getAdapter()).setOnLongClickListener(NoteListFrag.this);
-            }
-        });
-
     }
 
     @Override
     public void onClick(View v) {
-        Note note = (Note) v.getTag(R.id.data);
-        if (note.getType().endsWith(Note.NOTE)) {
-            NoteDetailsFrag txtFarg = new NoteDetailsFrag();
-            FragList.getInstance().add(getActivity(), txtFarg);
-            return;
-        }
 
-        BmobQuery<Note> query = new BmobQuery<Note>();
-        //查询playerName叫“比目”的数据
-        query.addWhereEqualTo("parentId",note.getObjectId());
-        //返回50条数据，如果不加上这条语句，默认返回10条数据
-        query.setLimit(50);
-        //执行查询方法
-        query.findObjects(new FindListener<Note>() {
-            @Override
-            public void done(List<Note> object, BmobException e) {
-                if(object!=null && object.size()>0){
-                    NoteListssFrag noteListssFrag = new NoteListssFrag();
-                    Bundle bundle = new Bundle();
-                    ArrayList<Note> notes = (ArrayList<Note>) object;
-                    bundle.putSerializable("data", notes);
-                    noteListssFrag.setArguments(bundle);
-                    FragList.getInstance().add(getActivity(), noteListssFrag);
-                }
+        NoteListssFrag noteListssFrag = new NoteListssFrag();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("data", notes);
+        bundle.putInt("position", (Integer) v.getTag(R.id.position));
+        noteListssFrag.setArguments(bundle);
+        FragList.getInstance().add(getActivity(), noteListssFrag);
 
-            }
-        });
 
     }
 
     @Override
-    public boolean onLongClick(View v) {
+    public boolean onLongClick(final View v) {
         BoomFrag boomFrag = new BoomFrag();
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.root, boomFrag);
@@ -120,7 +109,80 @@ public class NoteListFrag extends BaseFrag implements View.OnClickListener, View
         boomFrag.setOnfinish(new Onfinish() {
             @Override
             public void finished(Object o) {
-                Toast.makeText(getContext(),"new note",Toast.LENGTH_LONG).show();
+                int index = (int) o;
+                final Note[] note = new Note[1];
+                switch (index) {
+                    case 0:
+                        //note
+                        note[0] = new Note(Note.NOTE, "新建笔记" + random.nextFloat() * 100);
+                        note[0].setData(gson.toJson(new GsonNoteBean()));
+                        note[0].setParentId(parentNote.getObjectId());
+                        note[0].save(new SaveListener<String>() {
+
+                            @Override
+                            public void done(String objectId, BmobException e) {
+                                getData();
+                            }
+                        });
+                        break;
+                    case 1:
+                        note[0] = new Note(Note.NOTEBOOK, "新建笔记本" + random.nextFloat() * 100);
+                        note[0].setParentId(parentNote.getObjectId());
+                        note[0].save(new SaveListener<String>() {
+
+                            @Override
+                            public void done(String objectId, BmobException e) {
+                                getData();
+                            }
+                        });
+                        //notebook
+                        break;
+                    case 2:
+                        //delete
+                        if (v.getTag(R.id.data) == null) {
+                            break;
+                        }
+                        note[0] = new Note();
+                        note[0].setObjectId(((Note) (v.getTag(R.id.data))).getObjectId());
+                        note[0].delete(new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                getData();
+                            }
+                        });
+                        break;
+                    case 3:
+                        //rename
+                        if (v.getTag(R.id.data) == null) {
+                            break;
+                        }
+                        RenameFrag renameFrag = new RenameFrag();
+                        FragList.getInstance().add(getActivity(), renameFrag);
+                        renameFrag.setOnfinish(new Onfinish() {
+                            @Override
+                            public void finished(Object o) {
+                                String s = (String) o;
+                                if (s.equals("")) {
+                                    return;
+                                }
+                                note[0] = new Note();
+                                note[0].setObjectId(((Note) (v.getTag(R.id.data))).getObjectId());
+                                note[0].setName(s);
+                                note[0].update(new UpdateListener() {
+                                    @Override
+                                    public void done(BmobException e) {
+                                        getData();
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                }
+                if (index > 2) {
+
+                } else {
+
+                }
             }
         });
         return true;
@@ -152,9 +214,9 @@ public class NoteListFrag extends BaseFrag implements View.OnClickListener, View
         public void onBindViewHolder(NewsAdapter.NewsHolder holder, int position) {
             holder.itemView.setOnClickListener(this);
             holder.itemView.setOnLongClickListener(this);
-            holder.itemView.setTag(R.id.data,position);
+            holder.itemView.setTag(R.id.position, position);
             holder.itemView.setTag(R.id.data,notes.get(position));
-            holder.textView.setText(notes.get(position).getType()+notes.get(position).getName());
+            holder.textView.setText(notes.get(position).getType() + "  " + notes.get(position).getName());
         }
 
         @Override
