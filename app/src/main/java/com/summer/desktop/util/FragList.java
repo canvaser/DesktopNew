@@ -2,7 +2,6 @@ package com.summer.desktop.util;
 
 //by summer on 2017-05-23.
 
-import android.app.Activity;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -67,5 +66,9 @@ public class FragList {
         }
 
 
+    }
+
+    public void clear() {
+        fragments.clear();
     }
 }

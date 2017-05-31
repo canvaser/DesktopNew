@@ -217,6 +217,7 @@ public class NoteListFrag extends BaseFrag implements View.OnClickListener, View
             holder.itemView.setTag(R.id.position, position);
             holder.itemView.setTag(R.id.data,notes.get(position));
             holder.textView.setText(notes.get(position).getType() + "  " + notes.get(position).getName());
+            holder.dateTV.setText(notes.get(position).getUpdatedAt() + "  " + notes.get(position).getCreatedAt());
         }
 
         @Override
@@ -252,6 +253,8 @@ public class NoteListFrag extends BaseFrag implements View.OnClickListener, View
             @BindView(R.id.textView)
             TextView textView;
 
+            @BindView(R.id.date)
+            TextView dateTV;
 
             public NewsHolder(View itemView) {
                 super(itemView);

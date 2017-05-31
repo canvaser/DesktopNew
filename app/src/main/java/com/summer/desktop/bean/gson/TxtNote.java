@@ -8,7 +8,7 @@ import com.summer.desktop.base.BaseBean;
 
 public class TxtNote extends BaseBean {
 
-    private String txt;
+    private String txt = "";
 
     private float size;
 

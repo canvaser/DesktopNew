@@ -8,7 +8,19 @@ import com.summer.desktop.base.BaseBean;
 
 public class ImageNote extends BaseBean {
 
-    private String src;
+    private String src = "";
+
+    private String localSrc;
+
+    private int width;
+
+    private int height;
+
+    public ImageNote(String localSrc, int width, int height) {
+        this.localSrc = localSrc;
+        this.width = width;
+        this.height = height;
+    }
 
     public ImageNote(String src) {
         this.src = src;
@@ -20,5 +32,29 @@ public class ImageNote extends BaseBean {
 
     public void setSrc(String src) {
         this.src = src;
+    }
+
+    public String getLocalSrc() {
+        return localSrc;
+    }
+
+    public void setLocalSrc(String localSrc) {
+        this.localSrc = localSrc;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

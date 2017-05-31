@@ -1,11 +1,14 @@
 package com.summer.desktop;
 
 import android.app.Application;
-import cn.bmob.v3.Bmob;
+
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.summer.desktop.util.ScreenUtil;
+
+import cn.bmob.v3.Bmob;
 
 /**
  * Created by summer on 2017/5/25 23:47.
@@ -29,5 +32,9 @@ public class DesktopApp extends Application{
 
 
         Bmob.initialize(this, "a372099e1546f084af11ba4cfc1b8439");
+
+        ScreenUtil.getInstance().getScreenSize(getApplicationContext());
     }
+
+
 }

@@ -67,6 +67,12 @@ public class MainAct extends BaseAct implements View.OnClickListener{
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FragList.getInstance().clear();
+    }
+
     public void setTitle() {
         String ss = "";
         for (int i = 0; i < TitleUtil.getInstance().getName().size(); i++) {

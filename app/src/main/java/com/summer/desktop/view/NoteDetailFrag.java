@@ -3,10 +3,13 @@ package com.summer.desktop.view;
 //by summer on 2017-05-24.
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +31,7 @@ import com.summer.desktop.bean.gson.TxtNote;
 import com.summer.desktop.imp.Onfinish;
 import com.summer.desktop.util.IntentUtil;
 import com.summer.desktop.util.LogUtil;
+import com.summer.desktop.util.NullUtil;
 import com.summer.desktop.util.ViewCreater;
 
 import java.util.ArrayList;
@@ -109,30 +113,8 @@ public class NoteDetailFrag extends BaseFrag implements View.OnLongClickListener
     public void getData() {
         root.removeAllViews();
         root.addView(ViewCreater.create(getContext(), bean.getData()), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        ViewGroup view1 = (ViewGroup) root.getChildAt(0);
-        for (int i = 0; i < view1.getChildCount(); i++) {
-            view1.getChildAt(i).setOnLongClickListener(NoteDetailFrag.this);
-            view1.getChildAt(i).setTag(R.id.position, i);
-            view1.getChildAt(i).setTag(R.id.data, bean.getData().get(i));
-            if (view1.getChildAt(i) instanceof EditText) {
-                final EditText editText = (EditText) view1.getChildAt(i);
-                editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        if (hasFocus) {
-                            ed = (EditText) v;
-                        } else {
-                            int i = (int) v.getTag(R.id.position);
-                            EditText editText = (EditText) v;
-                            TxtNote txtNote = gson.fromJson(bean.getData().get(i).getData(), TxtNote.class);
-                            txtNote.setTxt(editText.getText().toString());
-                            bean.getData().get(i).setData(gson.toJson(txtNote));
-                        }
-                    }
-                });
+        ((NoteDetailAdapter) ((RecyclerView) root.getChildAt(0)).getAdapter()).setOnLongClickListener(this);
 
-            }
-        }
     }
 
     @Override
@@ -146,7 +128,7 @@ public class NoteDetailFrag extends BaseFrag implements View.OnLongClickListener
             public void finished(Object o) {
                 NoteDetail noteDetail = (NoteDetail) v.getTag(R.id.data);
                 int i = (int) v.getTag(R.id.position);
-                bean.getData().add(i, new NoteDetail(NoteDetail.TXT, gson.toJson(new TxtNote("new\\n"))));
+                bean.getData().remove(i);
                 getData();
             }
         });
@@ -194,17 +176,17 @@ public class NoteDetailFrag extends BaseFrag implements View.OnLongClickListener
         }
         if (noteDetails.get(i[0]).getType().equals(NoteDetail.IMAGE)) {
             final ImageNote imageNote = gson.fromJson(bean.getData().get(i[0]).getData(), ImageNote.class);
-            if (imageNote.getSrc().startsWith("file://")) {
-                java.io.File file = new java.io.File(imageNote.getSrc().substring("file://".length(), imageNote.getSrc().length()));
+            if (NullUtil.isStrEmpty(imageNote.getSrc())) {
+                java.io.File file = new java.io.File(imageNote.getLocalSrc().substring("file://".length(), imageNote.getLocalSrc().length()));
                 file.exists();
                 final BmobFile bmobFile = new BmobFile(file);
-
                 bmobFile.uploadblock(new UploadFileListener() {
                     @Override
                     public void done(BmobException e) {
                         if (e == null) {
                             imageNote.setSrc(bmobFile.getFileUrl());
                             noteDetails.get(i[0]).setData(gson.toJson(imageNote));
+                            LogUtil.E(bmobFile.getFileUrl().toString());
                         }
                         i[0]++;
                         update(noteDetails, i, onfinish);
@@ -233,30 +215,23 @@ public class NoteDetailFrag extends BaseFrag implements View.OnLongClickListener
         }
         if (ed != null && bean.getData()!=null && bean.getData().size() > 0) {
             int i = (int) ed.getTag(R.id.position);
-            bean.getData().add(i,new NoteDetail(NoteDetail.IMAGE,gson.toJson(new ImageNote(data.getDataString()))));
+            java.io.File file = new java.io.File(data.getDataString().substring("file://".length(), data.getDataString().length()));
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), options);
+            bean.getData().add(i, new NoteDetail(NoteDetail.IMAGE, gson.toJson(new ImageNote(data.getDataString(), options.outWidth, options.outHeight))));
         } else {
-            bean.getData().add(new NoteDetail(NoteDetail.IMAGE, gson.toJson(new ImageNote(data.getDataString()))));
+            java.io.File file = new java.io.File(data.getDataString().substring("file://".length(), data.getDataString().length()));
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), options);
+            bean.getData().add(new NoteDetail(NoteDetail.IMAGE, gson.toJson(new ImageNote(data.getDataString(), options.outWidth, options.outHeight))));
         }
 
 
 
         root.removeAllViews();
         root.addView(ViewCreater.create(getContext(), bean.getData()), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        ViewGroup view1 = (ViewGroup) root.getChildAt(0);
-        for (int i = 0; i < view1.getChildCount(); i++) {
-            view1.getChildAt(i).setOnLongClickListener(NoteDetailFrag.this);
-            if (view1.getChildAt(i) instanceof EditText) {
-                EditText editText = (EditText) view1.getChildAt(i);
-                editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        if (hasFocus) {
-                            ed = (EditText) v;
-                        }
-                    }
-                });
 
-            }
-        }
     }
 }
